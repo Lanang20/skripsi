@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% block title %}Role | SIPDA Cilacap{% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="role">
+    <div class="cardRole">
+        <div class="cardHeader">
+            <h2 class="text-center">Daftar Role</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddRole">
+                <i class="fas fa-plus me-2"></i>Tambah Role
+            </button>
+
+            <div class="table-responsive mt-3">
+                <table class="table table-striped table-bordered table-sm text-center" id="myTable">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th style="text-align: center;">No.</th>
+                            <th style="text-align: center;">Nama Role</th>
+                            <th style="text-align: center;">Tempat (Bendung)</th>
+                            <th style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in role_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td style="text-align: start;">{{ role.nama_role }}</td>
+                            <td style="text-align: start;">{{ role.tempat.nama_sta }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#EditRole{{ role.id }}">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="confirmDeleteRole({{ role.id }})">Hapus</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Role -->
+    <div class="modal fade" id="AddRole" tabindex="-1" aria-labelledby="AddRoleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="addRoleForm" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tambah Role</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label>Nama Role</label>
+                            <input type="text" class="form-control" name="nama_role" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tempat">Pilih Bendung</label>
+                            <select class="form-select" name="tempat" required>
+                                <option value="" disabled selected>Pilih Bendung</option>
+                                {% for b in bendung_list %}
+                                <option value="{{ b.id }}">{{ b.nama_sta }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Tambah</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Role -->
+    {% for role in role_list %}
+    <div class="modal fade" id="EditRole{{ role.id }}" tabindex="-1" aria-labelledby="EditRoleLabel{{ role.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="POST" id="editRoleForm{{ role.id }}">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Role</h5>
+                        <button class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" value="{{ role.id }}">
+                        <div class="mb-3">
+                            <label>Nama Role</label>
+                            <input type="text" class="form-control" name="nama_role" value="{{ role.nama_role }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Pilih Bendung</label>
+                            <select class="form-select" name="tempat" required>
+                                <option value="" disabled>Pilih Bendung</option>
+                                {% for b in bendung_list %}
+                                <option value="{{ b.id }}" {% if role.tempat.id == b.id %}selected{% endif %}>{{ b.nama_sta }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Tambah Role
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tangani submit form tambah role
+        document.getElementById('addRoleForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Hindari submit bawaan browser
+
+            const formData = new FormData(this);
+
+            fetch("{% url 'tambah_role' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Gagal menambahkan role.");
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: "Role berhasil disimpan!",
+                    icon: "success",
+                    customClass: {
+                        text: 'swal-text'
+                    }
+                }).then(() => {
+                    // Reset form dan tutup modal
+                    document.getElementById('addRoleForm').reset();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('AddRole'));
+                    if (modal) modal.hide();
+                    window.location.reload();
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: error.message || "Gagal menyimpan role.",
+                    icon: "error",
+                    confirmButtonColor: 'red',
+                    iconColor: 'red',
+                });
+            });
+        });
+
+        // Reset form saat modal AddRole dibuka
+        const addRoleModal = document.getElementById('AddRole');
+        addRoleModal.addEventListener('show.bs.modal', function () {
+            document.getElementById('addRoleForm').reset();
+        });
+    });
+
+    // Edit Role
+    document.querySelectorAll('[id^="editRoleForm"]').forEach(form => {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const id = form.querySelector("input[name='id']").value;
+            const formData = new FormData(form);
+            fetch(`/role/edit/${id}/`, {
+                method: "POST",
+                body: formData,
+                headers: { "X-CSRFToken": "{{ csrf_token }}" }
+            })
+            .then(res => res.json())
+            .then(() => Swal.fire("Sukses", "Role berhasil diubah", "success").then(() => location.reload()))
+            .catch(() => Swal.fire("Gagal", "Role gagal diubah", "error"));
+        });
+    });
+
+    // Hapus Role
+    function confirmDeleteRole(id) {
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: 'Data ini akan hilang permanen!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: 'red',
+            iconColor: 'red'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/role/hapus/${id}/`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                }).then(res => {
+                    if (res.ok) {
+                        Swal.fire('Dihapus!', 'Data berhasil dihapus.', 'success')
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire('Gagal!', 'Data gagal dihapus.', 'error');
+                    }
+                });
+            }
+        });
+    }
+</script>
+{% endblock %}

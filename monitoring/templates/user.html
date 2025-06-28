@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+{% block title %}User | SIPDA Cilacap{% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="pengguna">
+    <div class="cardUser">
+        <div class="cardHeader">
+            <h2 class="text-center">Daftar User</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddUser">
+                <i class="fas fa-plus me-2"></i>Tambah User
+            </button>
+            <div class="table-responsive mt-3">
+                <table class="table table-striped table-bordered table-sm text-center" id="myTable">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>No.</th>
+                            <th>Username</th>
+                            <th>Nama</th>
+                            <th>Jabatan</th>
+                            <th>Kemantren</th>
+                            <th>Email</th>
+                            <th>No. HP</th>
+                            <th>Role</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in user_list %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.nama }}</td>
+                            <td>{{ user.jabatan }}</td>
+                            <td>{{ user.unit_kerja.nama }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.no_hp }}</td>
+                            <td>{{ user.role.nama_role }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#EditUser{{ user.id }}">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="hapusUser({{ user.id }})">Hapus</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Tambah User -->
+<div class="modal fade" id="AddUser" tabindex="-1" aria-labelledby="AddUserLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="addUserForm" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="AddUserLabel">Tambah User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Username</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Nama</label>
+                            <input type="text" class="form-control" name="nama" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Jenis Kelamin</label>
+                            <select name="jenis_kelamin" class="form-select" required>
+                                <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Jabatan</label>
+                            <select name="jabatan" class="form-select" required>
+                                <option value="" disabled selected>Pilih Jabatan</option>
+                                <option value="Petugas Operasional Bendung">Petugas Operasional Bendung</option>
+                                <option value="Juru Operasional dan Pemeliharaan">Juru Operasional dan Pemeliharaan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Unit Kerja</label>
+                            <select name="unit_kerja" class="form-select" required>
+                                <option value="" disabled selected>Pilih Unit Kerja</option>
+                                {% for kemantren in kemantren_list %}
+                                    <option value="{{ kemantren.id }}">{{ kemantren.nama }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>No HP</label>
+                            <input type="text" class="form-control" name="no_hp" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Role</label>
+                            <select name="role" class="form-select" required>
+                                {% for r in role_list %}
+                                    <option value="{{ r.id }}">{{ r.nama_role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Tambah</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit User -->
+{% for user in user_list %}
+<div class="modal fade" id="EditUser{{ user.id }}" tabindex="-1" aria-labelledby="EditUserLabel{{ user.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="editUserForm{{ user.id }}" method="POST">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="EditUserLabel{{ user.id }}">Edit User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Username</label>
+                            <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Password (Kosongkan jika tidak diubah)</label>
+                            <input type="password" class="form-control" name="password">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Nama</label>
+                            <input type="text" class="form-control" name="nama" value="{{ user.nama }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Jenis Kelamin</label>
+                            <select name="jenis_kelamin" class="form-select">
+                                <option value="Laki-laki" {% if user.jenis_kelamin == "Laki-laki" %}selected{% endif %}>Laki-laki</option>
+                                <option value="Perempuan" {% if user.jenis_kelamin == "Perempuan" %}selected{% endif %}>Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Jabatan</label>
+                            <select name="jabatan" class="form-select">
+                                <option value="Petugas Operasional Bendung" {% if user.jabatan == "Petugas Operasional Bendung" %}selected{% endif %}>Petugas Operasional Bendung</option>
+                                <option value="Juru Operasional dan Pemeliharaan" {% if user.jabatan == "Juru Operasional dan Pemeliharaan" %}selected{% endif %}>Juru Operasional dan Pemeliharaan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Kemantren</label>
+                            <select name="unit_kerja" class="form-select">
+                                {% for k in kemantren_list %}
+                                    <option value="{{ k.id }}" {% if user.unit_kerja.id == k.id %}selected{% endif %}>{{ k.nama }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>No HP</label>
+                            <input type="text" class="form-control" name="no_hp" value="{{ user.no_hp }}" required>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Role</label>
+                            <select name="role" class="form-select">
+                                {% for r in role_list %}
+                                    <option value="{{ r.id }}" {% if user.role.id == r.id %}selected{% endif %}>{{ r.nama_role }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- SweetAlert2 + Script -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Tambah User
+    document.addEventListener('DOMContentLoaded', function () {
+        const addForm = document.getElementById('addUserForm');
+        const modal = document.getElementById('AddUser');
+
+        addForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("{% url 'tambah_user' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) return response.json().then(data => { throw new Error(data.message); });
+                return response.json();
+            })
+            .then(() => {
+                Swal.fire("Sukses", "User berhasil ditambahkan", "success").then(() => {
+                    addForm.reset();
+                    bootstrap.Modal.getInstance(modal).hide();
+                    location.reload();
+                });
+            })
+            .catch(error => {
+                Swal.fire("Gagal", error.message || "Username sudah digunakan", "error");
+            });
+        });
+
+        modal.addEventListener('show.bs.modal', () => addForm.reset());
+    });
+
+    // Edit User
+    document.querySelectorAll('[id^="editUserForm"]').forEach(form => {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const userId = form.querySelector('input[name="user_id"]').value;
+            const formData = new FormData(form);
+            fetch(`/user/edit/${userId}/`, {
+                method: "POST",
+                body: formData,
+                headers: { "X-CSRFToken": "{{ csrf_token }}" }
+            })
+            .then(res => res.json())
+            .then(() => Swal.fire("Sukses", "Data user berhasil diubah", "success").then(() => location.reload()))
+            .catch(() => Swal.fire("Gagal", "Data user gagal diubah", "error"));
+        });
+    });
+
+    // Hapus User
+    function hapusUser(id) {
+        Swal.fire({
+            title: "Yakin ingin menghapus user ini?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal",
+        }).then(result => {
+            if (result.isConfirmed) {
+                fetch(`/user/hapus/${id}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(res => {
+                    if (res.ok) {
+                        Swal.fire("Dihapus", "User berhasil dihapus", "success").then(() => location.reload());
+                    } else {
+                        Swal.fire("Gagal", "Tidak dapat menghapus user", "error");
+                    }
+                });
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,657 @@
+/* =========== Google Fonts ============ */
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Poppins&display=swap');
+
+/* =============== Globals ============== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Ubuntu", sans-serif;
+}
+:root {
+    --blue: #3843D6;
+    --white: #fff;
+    --black1: #222;
+    --black2: #999;
+    --gray: #333446;
+}
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+.pembungkus {
+    position: relative;
+    width: 100%;
+}
+
+/* =============== Navigation ================ */
+.navigation {
+    position: fixed;
+    width: 300px;
+    height: 100%;
+    background: var(--gray);
+    border-left: 10px solid var(--gray);
+    transition: 0.5s;
+    overflow: hidden;
+}
+.navigation.active {
+    width: 80px;
+}
+
+.navigation ul {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 0;
+}
+
+.navigation ul li {
+    position: relative;
+    width: 100%;
+    list-style: none;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+
+.navigation ul li:hover,
+.navigation ul li.hovered {
+    background-color: var(--white);
+}
+
+.navigation ul li:nth-child(1) {
+    margin-bottom: 40px;
+    pointer-events: none;
+}
+
+.navigation ul li a {
+    position: relative;
+    display: block;
+    width: 100%;
+    display: flex;
+    text-decoration: none;
+    color: var(--white);
+}
+.navigation ul li:hover a,
+.navigation ul li.hovered a {
+    color: var(--gray);
+}
+
+.navigation ul li a .icon {
+    position: relative;
+    display: block;
+    min-width: 60px;
+    height: 60px;
+    line-height: 75px;
+    text-align: center;
+}
+.navigation ul li a .icon ion-icon {
+    font-size: 1.75rem;
+}
+
+.navigation ul li a .title {
+    position: relative;
+    display: block;
+    padding: 0 10px;
+    height: 60px;
+    line-height: 60px;
+    text-align: start;
+    white-space: nowrap;
+}
+.navigation ul li a .titleMain {
+    font-family: 'Caveat Brush', cursive;
+    font-size: x-large;
+    position: relative;
+    display: block;
+    padding: 0 10px;
+    height: 60px;
+    line-height: 60px;
+    text-align: start;
+    white-space: nowrap;
+}
+
+/* --------- curve outside ---------- */
+.navigation ul li:hover a::before,
+.navigation ul li.hovered a::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: -50px;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: 35px 35px 0 10px var(--white);
+    pointer-events: none;
+}
+.navigation ul li:hover a::after,
+.navigation ul li.hovered a::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -50px;
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border-radius: 50%;
+    box-shadow: 35px -35px 0 10px var(--white);
+    pointer-events: none;
+}
+
+/* ===================== Main ===================== */
+.main {
+    position: absolute;
+    width: calc(100% - 300px);
+    left: 300px;
+    min-height: 100vh;
+    background: var(--white);
+    transition: 0.5s;
+}
+.main.active {
+    width: calc(100% - 80px);
+    left: 80px;
+}
+.topbar {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.topbar .sticky-topbar {
+    background-color: #ffffff;
+    padding: 10px 100px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.toggle {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    cursor: pointer;
+}
+
+.user {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.user img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ======================= kartu ====================== */
+.kartuBox {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 30px;
+}
+
+.kartuBox .kartu {
+    position: relative;
+    background: var(--white);
+    padding: 30px;
+    border-radius: 20px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+}
+
+.kartuBox .kartu .numbers {
+    position: relative;
+    font-weight: 500;
+    font-size: 2.5rem;
+    color: var(--blue);
+}
+
+.kartuBox .kartu .kartuName {
+    color: var(--black2);
+    font-size: 1.1rem;
+    margin-top: 5px;
+}
+
+.kartuBox .kartu .iconBx {
+    font-size: 3.5rem;
+    color: var(--black2);
+}
+
+.kartuBox .kartu:hover {
+    background: var(--blue);
+}
+.kartuBox .kartu:hover .numbers,
+.kartuBox .kartu:hover .kartuName,
+.kartuBox .kartu:hover .iconBx {
+    color: var(--white);
+}
+
+/* ================== Welcome ============== */
+.welcome {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-gap: 30px;
+    /* margin-top: 10px; */
+}
+
+.welcome .kartuWelcome {
+    position: relative;
+    display: grid;
+    min-height: 500px;
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    justify-content: center;
+    text-align: center;
+}
+
+.welcome img {
+    width: 400px;
+    height: 400px;
+}
+
+.welcome figure ul li {
+    list-style: decimal;
+    text-align: left;
+}
+.welcome figure p {
+    text-align: left;
+}
+.welcome .kartuHeader {
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.kartuHeader h2 {
+    font-weight: 600;
+    color: var(--blue);
+}
+.kartuHeader .btn {
+    position: relative;
+    padding: 5px 10px;
+    background: var(--blue);
+    text-decoration: none;
+    color: var(--white);
+    border-radius: 6px;
+}
+
+.penggunaTerbaru {
+    position: relative;
+    display: grid;
+    min-height: 500px;
+    padding: 20px;
+    background: var(--white);
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+}
+.penggunaTerbaru .imgBx {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50px;
+    overflow: hidden;
+}
+.penggunaTerbaru .imgBx img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.penggunaTerbaru table tr td {
+    padding: 12px 10px;
+}
+.penggunaTerbaru table tr td h4 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.2rem;
+}
+.penggunaTerbaru table tr td h4 span {
+    font-size: 14px;
+    color: var(--black2);
+}
+.penggunaTerbaru table tr:hover {
+    background: var(--blue);
+    color: var(--white);
+}
+.penggunaTerbaru table tr:hover td h4 span {
+    color: var(--white);
+}
+
+/* ================== HighCharts ============== */
+.highcharts-figure,
+.highcharts-data-table table {
+    min-width: 360px;
+    max-width: 800px;
+    margin: 1em auto;
+}
+
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #ebebeb;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+    padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tbody tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+
+.highcharts-description {
+    margin: 0.3rem 10px;
+}
+
+input[type="number"] {
+    min-width: 50px;
+}
+
+/* ================== Bendung ============== */
+.bendung {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    /* margin-top: 10px; */
+}
+
+.bendung .icon ion-icon {
+    font-size: 1.75rem;
+}
+
+.bendung p {
+    margin-left: 0;
+    text-align: justify;
+}
+
+.bendung ul li {
+    list-style: decimal;
+    text-align: justify;
+}
+
+.bendung .cardBendung {
+    position: relative;
+    min-height: 500px;
+    width: 100vw;
+    /* height: 84vh; width: 100vw; */
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    justify-content: center;
+}
+
+.bendung .cardHeader {
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* ================== Kemantren ============== */
+.kemantren {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    /* margin-top: 10px; */
+}
+
+.kemantren .icon ion-icon {
+    font-size: 1.75rem;
+}
+
+.kemantren p {
+    margin-left: 0;
+    text-align: justify;
+}
+
+.kemantren ul li {
+    list-style: decimal;
+    text-align: justify;
+}
+
+.kemantren .cardKemantren {
+    position: relative;
+    min-height: 500px;
+    width: 100vw;
+    /* height: 84vh; width: 100vw; */
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    justify-content: center;
+}
+
+.kemantren .cardHeader {
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* ================== Role ============== */
+.role {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    /* margin-top: 10px; */
+}
+
+.role .icon ion-icon {
+    font-size: 1.75rem;
+}
+
+.role p {
+    margin-left: 0;
+    text-align: justify;
+}
+
+.role ul li {
+    list-style: decimal;
+    text-align: justify;
+}
+
+.role .cardRole {
+    position: relative;
+    min-height: 500px;
+    width: 100vw;
+    /* height: 84vh; width: 100vw; */
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    justify-content: center;
+}
+
+.role .cardHeader {
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* ================== User ============== */
+.pengguna {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    /* margin-top: 10px; */
+}
+
+.pengguna .icon ion-icon {
+    font-size: 1.75rem;
+}
+
+.pengguna p {
+    margin-left: 0;
+    text-align: justify;
+}
+
+.pengguna ul li {
+    list-style: decimal;
+    text-align: justify;
+}
+
+.pengguna .cardUser {
+    position: relative;
+    min-height: 500px;
+    width: 100vw;
+    /* height: 84vh; width: 100vw; */
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    justify-content: center;
+}
+
+.pengguna .cardHeader {
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* ================== Debit Air ============== */
+.debit {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    /* margin-top: 10px; */
+}
+
+.debit .icon ion-icon {
+    font-size: 1.75rem;
+}
+
+.debit p {
+    margin-left: 0;
+    text-align: justify;
+}
+
+.debit ul li {
+    list-style: decimal;
+    text-align: justify;
+}
+
+.debit .cardDebit {
+    position: relative;
+    min-height: 500px;
+    width: 100vw;
+    /* height: 84vh; width: 100vw; */
+    background: var(--white);
+    padding: 20px;
+    box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    justify-content: center;
+}
+
+.debit .cardHeader {
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+
+/* ====================== Responsive Design ========================== */
+@media (max-width: 991px) {
+    .navigation {
+        left: -300px;
+    }
+    .navigation.active {
+        width: 300px;
+        left: 0;
+    }
+    .main {
+        width: 100%;
+        left: 0;
+    }
+    .main.active {
+        left: 300px;
+    }
+    .kartuBox {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome {
+        grid-template-columns: 1fr;
+    }
+    .kartuWelcome {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .kartuBox {
+        grid-template-columns: repeat(1, 1fr);
+    }
+    .kartuHeader h2 {
+        font-size: 20px;
+    }
+    .cardHeader h2 {
+        font-size: 20px;
+    }
+    .user {
+        min-width: 40px;
+    }
+    .navigation {
+        width: 100%;
+        left: -100%;
+        z-index: 1000;
+    }
+    .navigation.active {
+        width: 63%;
+        left: 0;
+    }
+    .toggle {
+        z-index: 10001;
+    }
+    .main.active .toggle {
+        color: #fff;
+        position: relative;
+        right: 0;
+        left: initial;
+    }
+}

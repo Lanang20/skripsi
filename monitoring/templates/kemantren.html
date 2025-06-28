@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% block title %}Kemantren | SIPDA Cilacap{% endblock %}
+{% block content %}
+{% load static %}
+    <!-- ================ Kemantren ================= -->
+    <div class="kemantren">
+        <div class="cardKemantren">
+            <div class="cardHeader">
+                <h2 class="text-center">Daftar Kemantren</h2>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#AddKemantren"><i class="fas fa-plus me-2"></i>Tambah Kemantren</button>
+                <div class="table-responsive mt-3">
+                    <table class="table table-striped table-bordered table-sm text-center" id="myTable">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th style="text-align: center;">No.</th>
+                                <th style="text-align: center;">Nama Kemantren</th>
+                                <th style="text-align: center;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for kemantren in kemantren_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td style="text-align: start;">{{ kemantren.nama }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#EditKemantren{{ kemantren.id }}">Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteKemantren({{ kemantren.id }})">
+                                        Hapus</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Tambah Kemantren -->
+        <div class="modal fade" id="AddKemantren" tabindex="-1" aria-labelledby="AddKemantrenLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal">
+                <div class="modal-content">
+                    <form id="addKemantrenForm" method="POST">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tambah Kemantren</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            <div class="col-md-12 mb-3">
+                                <label>Nama Kemantren</label>
+                                <input type="text" class="form-control" name="nama" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Tambah</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Kemantren -->
+        {% for kemantren in kemantren_list %}
+        <div class="modal fade" id="EditKemantren{{ kemantren.id }}" tabindex="-1" aria-labelledby="EditKemantrenLabel{{ kemantren.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal">
+                <div class="modal-content">
+                    <form method="POST" id="editKemantrenForm{{ kemantren.id }}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="EditKemantrenLabel{{ kemantren.id }}">Edit Kemantren</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" value="{{ kemantren.id }}">
+                            <div class="col-md-12 mb-3">
+                                <label for="nama_{{ kemantren.id }}" class="form-label">Nama STA</label>
+                                <input type="text" class="form-control" id="nama_{{ kemantren.id }}" name="nama" value="{{ kemantren.nama }}" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Tambah Kemantren
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tangani submit form tambah Kemantren
+        document.getElementById('addKemantrenForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Hindari submit bawaan browser
+
+            const formData = new FormData(this);
+
+            fetch("{% url 'tambah_kemantren' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Gagal menambahkan kemantren.");
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: "Kemantren berhasil disimpan!",
+                    icon: "success",
+                    customClass: {
+                        text: 'swal-text'
+                    }
+                }).then(() => {
+                    // Reset form dan tutup modal
+                    document.getElementById('addKemantrenForm').reset();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('AddKemantren'));
+                    if (modal) modal.hide();
+                    window.location.reload();
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: error.message || "Gagal menyimpan kemantren.",
+                    icon: "error",
+                    confirmButtonColor: 'red',
+                    iconColor: 'red',
+                });
+            });
+        });
+
+        // Reset form saat modal AddKemantren dibuka
+        const addKemantrenModal = document.getElementById('AddKemantren');
+        addKemantrenModal.addEventListener('show.bs.modal', function () {
+            document.getElementById('addKemantrenForm').reset();
+        });
+    });
+
+    // Pop Up Edit
+    document.querySelectorAll('[id^="editKemantrenForm"]').forEach(form => {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const id = form.querySelector("input[name='id']").value;
+            const formData = new FormData(form);
+            fetch(`/kemantren/edit/${id}/`, {
+                method: "POST",
+                body: formData,
+                headers: { "X-Requested-With": "XMLHttpRequest", "X-CSRFToken": "{{ csrf_token }}" }
+            })
+            .then(res => res.json())
+            .then(() => Swal.fire("Sukses", "Data berhasil diubah.", "success")
+                .then(() => location.reload()))
+            .catch(() => Swal.fire("Gagal", "Data gagal diubah.", "error"));
+        });
+    });
+
+    // Pop Up Hapus
+    function confirmDeleteKemantren(id) {
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: 'Data ini akan hilang permanen!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: 'red',
+            iconColor: 'red'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/kemantren/hapus/${id}/`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                }).then(res => {
+                    if (res.ok) {
+                    Swal.fire('Dihapus!', 'Data berhasil dihapus.', 'success')
+                        .then(() => location.reload());
+                    } else {
+                    Swal.fire('Gagal!', 'Data gagal dihapus.', 'error');
+                    }
+                });
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | SIPDA Cilacap{% endblock %}
+{% block content %}
+{% load static %}
+    <!-- ======================= kartu ================== -->
+    <div class="kartuBox">
+        <div class="kartu">
+            <div>
+                <div class="numbers">{{ debit_saat_ini }} m³/dt</div>
+                <div class="kartuName">Debit Air Saat Ini</div>
+            </div>
+            
+            <div class="iconBx">
+                <ion-icon name="water"></ion-icon>
+            </div>
+        </div>
+
+        <div class="kartu">
+            <div>
+                {% if h_avg_saat_ini <= 0.4 %}
+                    <div class="numbers">Aman</div>
+                {% elif h_avg_saat_ini <= 0.80 %}
+                    <div class="numbers">Normal</div>
+                {% else %}
+                    <div class="numbers">Tinggi</div>
+                {% endif %}
+                <div class="kartuName">Prediksi Hari Ini</div>
+            </div>
+
+            <div class="iconBx">
+                {% if h_avg_saat_ini <= 0.4 %}
+                    <ion-icon name="ellipse" style="color: green;"></ion-icon>
+                {% elif h_avg_saat_ini <= 0.80 %}
+                    <ion-icon name="ellipse" style="color: yellow;"></ion-icon>
+                {% else %}
+                    <ion-icon name="ellipse" style="color: red;"></ion-icon>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="kartu">
+            <div>
+                <div class="numbers">
+                    {% if perubahan_persen > 0 %}
+                        +{{ perubahan_persen }}%
+                    {% elif perubahan_persen < 0 %}
+                        {{ perubahan_persen }}%
+                    {% else %}
+                        0%
+                    {% endif %}
+                </div>
+                <div class="kartuName">Perubahan dari Bulan Lalu</div>
+            </div>
+
+            <div class="iconBx">
+                <ion-icon name="alert"></ion-icon>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================ Highcharts ================= -->
+    <div class="welcome">
+        <div class="kartuWelcome">
+            <div class="kartuHeader">
+                <h2>Debit Air dalam Kurun Waktu Satu Tahun</h2><br>
+                <form method="GET" class="row g-2 mb-4">
+                    {% if user.is_superuser %}
+                    <div class="col-auto">
+                        <select name="bendung" class="form-select">
+                            <option value="" selected>-- Pilih Bendung --</option>
+                            {% for bendung in bendung_list %}
+                                <option value="{{ bendung.id }}" {% if bendung.id|stringformat:"s" == id_bendung %}selected{% endif %}>{{ bendung.nama_sta }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-auto">
+                        <select name="tahun" class="form-select">
+                            {% for thn in tahun_list %}
+                                <option value="{{ thn }}" {% if thn|stringformat:"s" == tahun %}selected{% endif %}>{{ thn }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">Tampilkan</button>
+                    </div>
+                </form>
+                <figure class="highcharts-figure">
+                    <div id="container"></div>
+                </figure>
+            </div>
+        </div>
+    
+
+        <!-- ================= Deskripsi ================ -->
+        <div class="penggunaTerbaru">
+            <div class="kartuHeader">
+                <h2>Deskripsi</h2>
+            </div>
+            <p style="text-align: justify;">
+                Indikator status debit air ditampilkan berdasarkan warna:
+            </p>
+            <p>
+                <ion-icon name="ellipse" style="color: green;"></ion-icon> <strong>Hijau:</strong> Aliran kecil (0 - 0,40m) - kondisi aman.<br>
+                <ion-icon name="ellipse" style="color: yellow;"></ion-icon> <strong>Kuning:</strong> Aliran normal (0,41 - 0,80m) - tetap waspada.<br>
+                <ion-icon name="ellipse" style="color: red;"></ion-icon> <strong>Merah:</strong> Aliran tinggi (> 0,80m) - potensi banjir.<br>
+            </p>
+            <p style="text-align: justify;">
+                Grafik Debit Air di samping menampilkan tren harian debit air setiap bulannya. 
+                Grafik ini membantu pengguna memantau fluktuasi debit air dan mengenali potensi 
+                kenaikan signifikan yang bisa berdampak terhadap wilayah sekitar.
+                tampilan perubahan dari bulan lalu disediakan untuk memberikan gambaran umum mengenai 
+                tren debit air dari waktu ke waktu.
+            </p>
+        </div>
+    </div>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script>
+        // Mendeteksi ukuran layar dengan media query
+        var isLargeScreen = window.matchMedia('(min-width: 481px)').matches;
+
+        // Build the chart
+        document.addEventListener("DOMContentLoaded", function () {
+            Highcharts.chart('container', {
+                title: {
+                    text: 'Rata-rata Debit Air Bulanan'
+                },
+                xAxis: {
+                    title: { text: 'Bulan' },
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+                },
+                yAxis: {
+                    title: { text: 'Debit Air (m³/s)' }
+                },
+                tooltip: {
+                    pointFormat: '{point.y} m³/s'
+                },
+                series: [{
+                    name: 'Debit Air',
+                    data: {{ data_grafik|safe }},
+                    color: '#007BFF'
+                }]
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% block title %}Data Debit Air | SIPDA{% endblock %}
+{% block content %}
+{% load static %}
+    <!-- ================ Debit Air ================= -->
+    <div class="debit">
+        <div class="cardDebit">
+            <div class="cardHeader">
+                <h2 class="text-center">Data Debit Air</h2>
+                <!-- Tombol dan Modal Tambah Debit Air -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalTambahDebitAir">
+                        <i class="fas fa-plus me-2"></i>Tambah Debit Air
+                    </button>
+                </div>
+
+                <!-- Filter -->
+                <form method="get" class="row g-2 mb-3">
+                    <div class="col-md-3">
+                        <label for="periode">Periode (Bulan & Tahun)</label>
+                        <input type="month" name="periode" class="form-control"
+                            value="{{ tahun }}-{{ bulan|add:"0"|slice:"-2" }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="opsi">Opsi Tanggal</label>
+                        <select name="opsi" class="form-select">
+                            <option {% if opsi == 'Full' %}selected{% endif %}>Full</option>
+                            <option {% if opsi == 'Tanggal 1-15' %}selected{% endif %}>Tanggal 1-15</option>
+                            <option {% if opsi == 'Tanggal 16-31' %}selected{% endif %}>Tanggal 16-31</option>
+                        </select>
+                    </div>
+                    {% if user.is_superuser %}
+                    <div class="col-md-3">
+                        <label for="bendung">Bendung</label>
+                        <select name="bendung" class="form-select">
+                            <option value="">-- Pilih Bendung --</option>
+                            {% for b in bendung_list %}
+                                <option value="{{ b.id }}" {% if id_bendung == b.id %}selected{% endif %}>{{ b.nama_sta }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table id="tabelDebitAir" class="table table-bordered table-sm align-middle text-center">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th rowspan="3">Tanggal</th>
+                                <th colspan="11">Muka Air Limpas dan Debit Bendung</th>
+                                <th colspan="12">Debit Pintu Intik Bendung</th>
+                                <th rowspan="3">Debit Total (m³/dt)</th>
+                                <th rowspan="3">Aksi</th>
+                            </tr>
+                            <tr>
+                                <th colspan="3">Jam 07.00</th>
+                                <th colspan="3">Jam 12.00</th>
+                                <th colspan="3">Jam 17.00</th>
+                                <th colspan="2">Rata-rata</th>
+
+                                <th colspan="4">Jam 07.00</th>
+                                <th colspan="4">Jam 12.00</th>
+                                <th colspan="4">Jam 17.00</th>
+                            </tr>
+                            <tr>
+                                <!-- Muka Air dan Limpas -->
+                                <th>H (m)</th>
+                                <th>Q (m³/dt)</th>
+                                <th></th>
+                                <th>H (m)</th>
+                                <th>Q (m³/dt)</th>
+                                <th></th>
+                                <th>H (m)</th>
+                                <th>Q (m³/dt)</th>
+                                <th></th>
+                                <th>H (m)</th>
+                                <th>Q (m³/dt)</th>
+
+                                <!-- Debit Pintu -->
+                                <th>H Kiri (m)</th>
+                                <th>Q Kiri (m³/dt)</th>
+                                <th>H Kanan (m)</th>
+                                <th>Q Kanan (m³/dt)</th>
+
+                                <th>H Kiri (m)</th>
+                                <th>Q Kiri (m³/dt)</th>
+                                <th>H Kanan (m)</th>
+                                <th>Q Kanan (m³/dt)</th>
+
+                                <th>H Kiri (m)</th>
+                                <th>Q Kiri (m³/dt)</th>
+                                <th>H Kanan (m)</th>
+                                <th>Q Kanan (m³/dt)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in data_debit %}
+                            <tr>
+                                <td>{{ data.tanggal|date:"d" }}</td>
+
+                                <td>{{ data.h_07 }}</td>
+                                <td>{{ data.q_07 }}</td>
+                                <td></td>
+
+                                <td>{{ data.h_12 }}</td>
+                                <td>{{ data.q_12 }}</td>
+                                <td></td>
+
+                                <td>{{ data.h_17 }}</td>
+                                <td>{{ data.q_17 }}</td>
+                                <td></td>
+
+                                <td>{{ data.h_avg }}</td>
+                                <td>{{ data.q_avg }}</td>
+
+                                <td>{{ data.h_kiri_07 }}</td><td>{{ data.q_kiri_07 }}</td>
+                                <td>{{ data.h_kanan_07 }}</td><td>{{ data.q_kanan_07 }}</td>
+                                <td>{{ data.h_kiri_12 }}</td><td>{{ data.q_kiri_12 }}</td>
+                                <td>{{ data.h_kanan_12 }}</td><td>{{ data.q_kanan_12 }}</td>
+                                <td>{{ data.h_kiri_17 }}</td><td>{{ data.q_kiri_17 }}</td>
+                                <td>{{ data.h_kanan_17 }}</td><td>{{ data.q_kanan_17 }}</td>
+
+                                <td>{{ data.debit_total }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#EditDebitAir{{ data.id }}">Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteDebitAir({{ data.id }})">Hapus</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <a href="{% url 'cetak_debit_air_pdf' %}?periode={{ tahun }}-{{ bulan|add:"0"|slice:"-2" }}&opsi={{ opsi }}{% if user.is_superuser and id_bendung %}&bendung={{ id_bendung }}{% endif %}" target="_blank" class="btn btn-success">
+                <i class="fas fa-file-pdf me-2"></i>Cetak PDF
+            </a>
+        </div>
+
+        <!-- Modal Tambah Debit Air -->
+        <div class="modal fade" id="modalTambahDebitAir" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="POST" id="formTambahDebitAir">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tambah Data Debit Air</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <!-- Tanggal dan Bendung -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="tanggal">Tanggal</label>
+                                    <input type="date" class="form-control" name="tanggal" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bendungan">Bendung</label>
+                                    <select class="form-select" name="bendungan" required>
+                                        <option value="">-- Pilih Bendung --</option>
+                                        {% for b in bendung_list %}
+                                            <option value="{{ b.id }}">{{ b.nama_sta }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Jam 07.00 -->
+                                <div class="col-md-12"><strong>Jam 07.00</strong></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_07" class="form-control h-input" placeholder="H (m)"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kiri_07" class="form-control h-input" placeholder="H Kiri"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kanan_07" class="form-control h-input" placeholder="H Kanan"></div>
+
+                                <!-- Jam 12.00 -->
+                                <div class="col-md-12 mt-3"><strong>Jam 12.00</strong></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_12" class="form-control h-input" placeholder="H (m)"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kiri_12" class="form-control h-input" placeholder="H Kiri"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kanan_12" class="form-control h-input" placeholder="H Kanan"></div>
+
+                                <!-- Jam 17.00 -->
+                                <div class="col-md-12 mt-3"><strong>Jam 17.00</strong></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_17" class="form-control h-input" placeholder="H (m)"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kiri_17" class="form-control h-input" placeholder="H Kiri"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kanan_17" class="form-control h-input" placeholder="H Kanan"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Tambah</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% for data in data_debit %}
+        <div class="modal fade" id="EditDebitAir{{ data.id }}" tabindex="-1" aria-labelledby="EditDebitAirLabel{{ data.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <form method="POST" id="editDebitAirForm{{ data.id }}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="EditDebitAirLabel{{ data.id }}">Edit Debit Air</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" value="{{ data.id }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="tanggal">Tanggal</label>
+                                    <input type="date" name="tanggal" class="form-control" value="{{ data.tanggal|date:'Y-m-d' }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="bendungan">Bendung</label>
+                                    <select name="bendungan" class="form-select" required>
+                                        <option value="">-- Pilih Bendung --</option>
+                                        {% for b in bendung_list %}
+                                            <option value="{{ b.id }}" {% if b.id == data.bendungan.id %}selected{% endif %}>{{ b.nama_sta }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Jam 07.00 -->
+                                <div class="col-md-12"><strong>Jam 07.00</strong></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_07" class="form-control" value="{{ data.h_07 }}"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kiri_07" class="form-control" value="{{ data.h_kiri_07 }}"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kanan_07" class="form-control" value="{{ data.h_kanan_07 }}"></div>
+
+                                <!-- Jam 12.00 -->
+                                <div class="col-md-12 mt-3"><strong>Jam 12.00</strong></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_12" class="form-control" value="{{ data.h_12 }}"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kiri_12" class="form-control" value="{{ data.h_kiri_12 }}"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kanan_12" class="form-control" value="{{ data.h_kanan_12 }}"></div>
+
+                                <!-- Jam 17.00 -->
+                                <div class="col-md-12 mt-3"><strong>Jam 17.00</strong></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_17" class="form-control" value="{{ data.h_17 }}"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kiri_17" class="form-control" value="{{ data.h_kiri_17 }}"></div>
+                                <div class="col-md-4 mb-3"><input type="number" step="any" name="h_kanan_17" class="form-control" value="{{ data.h_kanan_17 }}"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Tambah data
+        document.getElementById('formTambahDebitAir').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch("{% url 'tambah_debit_air' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            }).then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Data debit air berhasil ditambahkan.',
+                        icon: 'success'
+                    }).then(() => {
+                        form.reset();
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTambahDebitAir'));
+                        if (modal) modal.hide();
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Gagal', 'Gagal menyimpan data.', 'error');
+                }
+            }).catch(() => {
+                Swal.fire('Gagal', 'Terjadi kesalahan saat mengirim data.', 'error');
+            });
+        });
+        
+        // Edit
+        document.querySelectorAll('[id^="editDebitAirForm"]').forEach(form => {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                const id = form.querySelector("input[name='id']").value;
+                const formData = new FormData(form);
+                fetch(`/debit-air/edit/${id}/`, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    }
+                })
+                .then(res => res.json())
+                .then(() => Swal.fire("Sukses", "Data berhasil diubah.", "success")
+                    .then(() => location.reload()))
+                .catch(() => Swal.fire("Gagal", "Data gagal diubah.", "error"));
+            });
+        });
+
+        // Hapus
+        function confirmDeleteDebitAir(id) {
+            Swal.fire({
+                title: 'Yakin ingin menghapus?',
+                text: 'Data ini akan hilang permanen!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: 'red',
+                iconColor: 'red'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/debit-air/hapus/${id}/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                    }).then(res => {
+                        if (res.ok) {
+                            Swal.fire('Dihapus!', 'Data berhasil dihapus.', 'success')
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire('Gagal!', 'Data gagal dihapus.', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+{% endblock %}

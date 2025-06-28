@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% block title %}Bendung | SIPDA Cilacap{% endblock %}
+{% block content %}
+{% load static %}
+    <!-- ================ Bendung ================= -->
+    <div class="bendung">
+        <div class="cardBendung">
+            <div class="cardHeader">
+                <h2 class="text-center">Daftar Bendung</h2>
+                {% if user.is_superuser %}
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#AddBendung"><i class="fas fa-plus me-2"></i>Tambah Bendung</button>
+                {% endif %}
+                <div class="table-responsive mt-3">
+                    <table class="table table-striped table-bordered table-sm text-center" id="myTable">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th style="text-align: center;">No.</th>
+                                <th style="text-align: center;">Nama STA</th>
+                                <th style="text-align: center;">Nomor STA</th>
+                                <th style="text-align: center;">Sungai</th>
+                                <th style="text-align: center;">CA</th>
+                                <th style="text-align: center;">Desa</th>
+                                <th style="text-align: center;">Kecamatan</th>
+                                <th style="text-align: center;">Kabupaten</th>
+                                <th style="text-align: center;">Provinsi</th>
+                                <th style="text-align: center;">Koordinat LS</th>
+                                <th style="text-align: center;">Koordinat BT</th>
+                                <th style="text-align: center;">Kemantren</th>
+                                {% if user.is_superuser %}
+                                <th style="text-align: center;">Aksi</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bendung in bendung_list %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td style="text-align: start;">{{ bendung.nama_sta }}</td>
+                                <td style="text-align: start;">{{ bendung.nomor_sta }}</td>
+                                <td style="text-align: start;">{{ bendung.sungai }}</td>
+                                <td style="text-align: start;">{{ bendung.ca }}</td>
+                                <td style="text-align: start;">{{ bendung.desa }}</td>
+                                <td style="text-align: start;">{{ bendung.kecamatan }}</td>
+                                <td style="text-align: start;">{{ bendung.kabupaten }}</td>
+                                <td style="text-align: start;">{{ bendung.provinsi }}</td>
+                                <td style="text-align: start;">{{ bendung.koordinat_ls }}</td>
+                                <td style="text-align: start;">{{ bendung.koordinat_bt }}</td>
+                                <td style="text-align: start;">{{ bendung.kemantren.nama }}</td>
+                                {% if user.is_superuser %}
+                                <td>
+                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#EditBendung{{ bendung.id }}">Edit</button>
+                                    <button class="btn btn-sm btn-danger" onclick="confirmDeleteBendung({{ bendung.id }})">
+                                        Hapus</button>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Tambah Bendung -->
+        <div class="modal fade" id="AddBendung" tabindex="-1" aria-labelledby="AddBendungLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <form id="addBendungForm" method="POST">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tambah Bendung</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label>Nama STA</label>
+                                    <input type="text" class="form-control" name="nama_sta" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Nomor STA</label>
+                                    <input type="text" class="form-control" name="nomor_sta" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Sungai</label>
+                                    <input type="text" class="form-control" name="sungai" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>CA</label>
+                                    <input type="text" class="form-control" name="ca" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Desa</label>
+                                    <input type="text" class="form-control" name="desa" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Kecamatan</label>
+                                    <input type="text" class="form-control" name="kecamatan" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Kabupaten</label>
+                                    <input type="text" class="form-control" name="kabupaten" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Provinsi</label>
+                                    <input type="text" class="form-control" name="provinsi" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Koordinat LS</label>
+                                    <input type="text" class="form-control" name="koordinat_ls" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label>Koordinat BT</label>
+                                    <input type="text" class="form-control" name="koordinat_bt" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="kemantren">Kemantren</label>
+                                    <select name="kemantren" class="form-select" required>
+                                        <option value="" disabled selected>Pilih Kemantren</option>
+                                        {% for k in kemantren_list %}
+                                            <option value="{{ k.id }}">{{ k.nama }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Tambah</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Edit Bendung -->
+        {% for bendung in bendung_list %}
+        <div class="modal fade" id="EditBendung{{ bendung.id }}" tabindex="-1" aria-labelledby="EditBendungLabel{{ bendung.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <form method="POST" id="editBendungForm{{ bendung.id }}">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="EditBendungLabel{{ bendung.id }}">Edit Bendung</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" value="{{ bendung.id }}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="nama_sta_{{ bendung.id }}" class="form-label">Nama STA</label>
+                                    <input type="text" class="form-control" id="nama_sta_{{ bendung.id }}" name="nama_sta" value="{{ bendung.nama_sta }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="nomor_sta_{{ bendung.id }}" class="form-label">Nomor STA</label>
+                                    <input type="text" class="form-control" id="nomor_sta_{{ bendung.id }}" name="nomor_sta" value="{{ bendung.nomor_sta }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="sungai_{{ bendung.id }}" class="form-label">Sungai</label>
+                                    <input type="text" class="form-control" id="sungai_{{ bendung.id }}" name="sungai" value="{{ bendung.sungai }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="ca_{{ bendung.id }}" class="form-label">CA</label>
+                                    <input type="text" class="form-control" id="ca_{{ bendung.id }}" name="ca" value="{{ bendung.ca }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="desa_{{ bendung.id }}" class="form-label">Desa</label>
+                                    <input type="text" class="form-control" id="desa_{{ bendung.id }}" name="desa" value="{{ bendung.desa }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="kecamatan_{{ bendung.id }}" class="form-label">Kecamatan</label>
+                                    <input type="text" class="form-control" id="kecamatan_{{ bendung.id }}" name="kecamatan" value="{{ bendung.kecamatan }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="kabupaten_{{ bendung.id }}" class="form-label">Kabupaten</label>
+                                    <input type="text" class="form-control" id="kabupaten_{{ bendung.id }}" name="kabupaten" value="{{ bendung.kabupaten }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="provinsi_{{ bendung.id }}" class="form-label">Provinsi</label>
+                                    <input type="text" class="form-control" id="provinsi_{{ bendung.id }}" name="provinsi" value="{{ bendung.provinsi }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="koordinat_ls_{{ bendung.id }}" class="form-label">Koordinat LS</label>
+                                    <input type="text" class="form-control" id="koordinat_ls_{{ bendung.id }}" name="koordinat_ls" value="{{ bendung.koordinat_ls }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="koordinat_bt_{{ bendung.id }}" class="form-label">Koordinat BT</label>
+                                    <input type="text" class="form-control" id="koordinat_bt_{{ bendung.id }}" name="koordinat_bt" value="{{ bendung.koordinat_bt }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="kemantren_{{ bendung.id }}">Kemantren</label>
+                                    <select name="kemantren" id="kemantren_{{ bendung.id }}" class="form-select" required>
+                                        <option value="" disabled>Pilih Kemantren</option>
+                                        {% for k in kemantren_list %}
+                                            <option value="{{ k.id }}" {% if bendung.kemantren.id == k.id %}selected{% endif %}>
+                                                {{ k.nama }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+<!-- SweetAlert2 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    // Tambah Bendung
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tangani submit form tambah Bendung
+        document.getElementById('addBendungForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Hindari submit bawaan browser
+
+            const formData = new FormData(this);
+
+            fetch("{% url 'tambah_bendung' %}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Gagal menambahkan bendung.");
+                return response.json();
+            })
+            .then(data => {
+                Swal.fire({
+                    title: "Bendung berhasil disimpan!",
+                    icon: "success",
+                    customClass: {
+                        text: 'swal-text'
+                    }
+                }).then(() => {
+                    // Reset form dan tutup modal
+                    document.getElementById('addBendungForm').reset();
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('AddBendung'));
+                    if (modal) modal.hide();
+                    window.location.reload();
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: error.message || "Gagal menyimpan bendung.",
+                    icon: "error",
+                    confirmButtonColor: 'red',
+                    iconColor: 'red',
+                });
+            });
+        });
+
+        // Reset form saat modal AddBendung dibuka
+        const addBendungModal = document.getElementById('AddBendung');
+        addBendungModal.addEventListener('show.bs.modal', function () {
+            document.getElementById('addBendungForm').reset();
+        });
+    });
+
+    // Pop Up Edit
+    document.querySelectorAll('[id^="editBendungForm"]').forEach(form => {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const id = form.querySelector("input[name='id']").value;
+            const formData = new FormData(form);
+            fetch(`/bendung/edit/${id}/`, {
+                method: "POST",
+                body: formData,
+                headers: { "X-Requested-With": "XMLHttpRequest", "X-CSRFToken": "{{ csrf_token }}" }
+            })
+            .then(res => res.json())
+            .then(() => Swal.fire("Sukses", "Data berhasil diubah.", "success")
+                .then(() => location.reload()))
+            .catch(() => Swal.fire("Gagal", "Data gagal diubah.", "error"));
+        });
+    });
+
+    // Pop Up Hapus
+    function confirmDeleteBendung(id) {
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: 'Data ini akan hilang permanen!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: 'red',
+            iconColor: 'red'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/bendung/hapus/${id}/`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+                }).then(res => {
+                    if (res.ok) {
+                    Swal.fire('Dihapus!', 'Data berhasil dihapus.', 'success')
+                        .then(() => location.reload());
+                    } else {
+                    Swal.fire('Gagal!', 'Data gagal dihapus.', 'error');
+                    }
+                });
+            }
+        });
+    }
+</script>
+{% endblock %}

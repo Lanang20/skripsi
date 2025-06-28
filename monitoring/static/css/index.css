@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Poppins&display=swap');
+body {
+    font-family: 'Poppins', sans-serif;
+    padding-top: 120px;
+}
+
+img#gambar-login {
+    margin-top: 10px;
+}
+
+/* CSS untuk section Home */
+#Home p {
+    font-size: 15px;
+    text-align: justify;
+}
+#Home h1 {
+    color: #3843D6;
+    font-size: 30px;
+}
+#Home {
+    background-image: url(/static/images/circle-home.svg);
+    background-repeat: no-repeat;
+    background-size: 30vmax;
+    background-position-x: 120px;
+    background-position-y: 415px;
+}
+.btn-login {
+    display: inline-block;
+    color: white;
+    background-color: #3843D6;
+    border-radius: .4em;
+    padding: 0.5em 2em;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: 0.5s ease;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.3);
+}
+.h5-login {
+    font-family: 'Caveat Brush', cursive;
+    color: #3843D6;
+    font-size: 35px;
+}
+.btn-cancel {
+    display: inline-block;
+    color: #3843D6;
+    border: 1px solid #3843D6;
+    background-color: transparent;
+    border-radius: .4em;
+    padding: 0.5em 2em;
+    text-decoration: none;
+    transition: 0.5s ease;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    #Home {
+        background-image: none;
+    }
+    #Home img {
+        margin-top: 20px;
+        margin-left: 35px;
+    }
+}
+@media (max-width: 768px) {
+    #Home {
+        background-image: none;
+    }
+    .col-md-6 {
+        width: 100%;
+    }
+}
