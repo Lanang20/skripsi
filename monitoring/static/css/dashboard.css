@@ -244,6 +244,20 @@ body {
     color: var(--white);
 }
 
+.cardHeader h2 {
+    font-weight: 600;
+    color: var(--blue);
+}
+.cardHeader h1 {
+    font-family: 'Caveat Brush', cursive;
+    color: var(--blue);
+    font-size: 40px;
+}
+.cardHeader p {
+    font-size: 15px;
+    margin-left: 180px;
+}
+
 /* ================== Welcome ============== */
 .welcome {
     position: relative;
@@ -561,6 +575,13 @@ input[type="number"] {
     /* margin-top: 10px; */
 }
 
+#tabelDebitAir th,
+#tabelDebitAir td {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 12px;
+}
+
 .debit .icon ion-icon {
     font-size: 1.75rem;
 }
@@ -593,7 +614,7 @@ input[type="number"] {
 }
 
 /* ================== Logout ============== */
-.keluar {
+.Out {
     position: relative;
     width: 100%;
     padding: 20px;
@@ -601,7 +622,7 @@ input[type="number"] {
     /* margin-top: 10px; */
 }
 
-.keluar .cardKeluar {
+.out .cardOut {
     position: relative;
     min-height: 500px;
     width: 100vw;
@@ -614,18 +635,18 @@ input[type="number"] {
     text-align: center;
 }
 
-.keluar .cardHeader {
+.out .cardHeader {
     justify-content: space-between;
     align-items: flex-start;
 }
-.keluar .cardkeluar img {
+.out .cardOut img {
     width: 60vw;
     height: 53vh;
 }
-.btn-keluar {
+.btn-out {
     display: inline-block;
     color: white;
-    background-color: var(--green3);
+    background-color: red;
     border-radius: .4em;
     padding: 0.5em 2em;
     text-decoration: none;
@@ -662,11 +683,14 @@ input[type="number"] {
     .kartuWelcome {
         overflow-x: auto;
     }
-    .keluar {
+    .out {
         grid-template-columns: 1fr;
     }
-    .cardKeluar {
+    .cardOut {
         overflow-x: auto;
+    }
+    .cardOut p {
+        margin-left: 115px;
     }
 }
 
@@ -683,7 +707,7 @@ input[type="number"] {
     .user {
         min-width: 40px;
     }
-    .cardKeluar p {
+    .cardOut p {
         margin-left: 0;
     }
     .navigation {
