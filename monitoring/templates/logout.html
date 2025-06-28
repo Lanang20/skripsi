@@ -3,8 +3,8 @@
 {% block content %}
 {% load static %}
     <!-- ================ Logout ================= -->
-    <div class="tes">
-        <div class="cardTes">
+    <div class="keluar">
+        <div class="cardKeluar">
             <div class="cardHeader">
                 <h1 class="mb-3">
                     Apakah Anda yakin ingin keluar?
@@ -15,7 +15,7 @@
                 </P>
                 <img src="{% static 'images/logout.svg' %}" alt="">
                 <div class="col-12">
-                    <a href="{% url 'logout_session' %}" class="btn btn-danger btn-mulai btn-sm px-4 me-md-2">
+                    <a href="{% url 'logout_session' %}" class="btn btn-danger btn-keluar btn-sm px-4 me-md-2">
                         <ion-icon style="width: 22px; height: 22px; vertical-align: middle;" name="log-out-outline">
                         </ion-icon><span style="padding: 0 4px; vertical-align: middle;">Sign Out</a>
                 </div>
